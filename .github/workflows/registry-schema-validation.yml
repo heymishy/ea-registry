@@ -1,0 +1,162 @@
+name: Registry Schema Validation
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  validate-registry:
+    name: validate-registry
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install pyyaml
+
+      - name: Validate registry YAML structure and references
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import sys
+          import yaml
+
+          ROOT = Path("registry")
+          APPS_DIR = ROOT / "applications"
+          IFACES_DIR = ROOT / "interfaces"
+          DOMAINS_DIR = ROOT / "domains"
+
+          errors = []
+
+          def load_yaml(path: Path):
+              try:
+                  with path.open("r", encoding="utf-8") as f:
+                      data = yaml.safe_load(f)
+                  if not isinstance(data, dict):
+                      errors.append(f"{path}: top-level YAML must be a mapping")
+                      return {}
+                  return data
+              except Exception as ex:
+                  errors.append(f"{path}: YAML parse error: {ex}")
+                  return {}
+
+          app_files = sorted(
+              p for p in APPS_DIR.glob("*.yaml") if p.name != "_template.yaml"
+          )
+          iface_files = sorted(
+              p for p in IFACES_DIR.glob("*.yaml") if p.name != "_template.yaml"
+          )
+          domain_files = sorted(
+              p for p in DOMAINS_DIR.glob("*.yaml") if p.name != "_template.yaml"
+          )
+
+          apps = {}
+          for path in app_files:
+              data = load_yaml(path)
+              required = [
+                  "slug",
+                  "name",
+                  "owner",
+                  "domain",
+                  "business_capability",
+                  "tier",
+                  "lifecycle_status",
+                  "verification_status",
+              ]
+              for key in required:
+                  if key not in data:
+                      errors.append(f"{path}: missing required field '{key}'")
+
+              slug = data.get("slug")
+              if not isinstance(slug, str) or not slug:
+                  errors.append(f"{path}: 'slug' must be a non-empty string")
+              else:
+                  if slug in apps:
+                      errors.append(
+                          f"{path}: duplicate app slug '{slug}' also in {apps[slug]['_path']}"
+                      )
+                  apps[slug] = {"_path": path, **data}
+
+          for path in iface_files:
+              data = load_yaml(path)
+              required = [
+                  "slug",
+                  "name",
+                  "source",
+                  "target",
+                  "type",
+                  "subtype",
+                  "direction",
+                  "criticality",
+                  "verification_status",
+              ]
+              for key in required:
+                  if key not in data:
+                      errors.append(f"{path}: missing required field '{key}'")
+
+              src = data.get("source", {})
+              tgt = data.get("target", {})
+              if not isinstance(src, dict) or "app" not in src:
+                  errors.append(f"{path}: source.app is required")
+              if not isinstance(tgt, dict) or "app" not in tgt:
+                  errors.append(f"{path}: target.app is required")
+
+              src_app = src.get("app") if isinstance(src, dict) else None
+              tgt_app = tgt.get("app") if isinstance(tgt, dict) else None
+
+              if isinstance(src_app, str) and src_app not in apps:
+                  errors.append(
+                      f"{path}: source.app '{src_app}' not found in registry/applications"
+                  )
+              if isinstance(tgt_app, str) and tgt_app not in apps:
+                  errors.append(
+                      f"{path}: target.app '{tgt_app}' not found in registry/applications"
+                  )
+
+          for path in domain_files:
+              data = load_yaml(path)
+              if "slug" not in data:
+                  errors.append(f"{path}: missing required field 'slug'")
+              if "name" not in data:
+                  errors.append(f"{path}: missing required field 'name'")
+
+              listed_apps = data.get("applications", [])
+              if listed_apps is None:
+                  listed_apps = []
+              if not isinstance(listed_apps, list):
+                  errors.append(f"{path}: 'applications' must be a list")
+                  continue
+
+              for app_slug in listed_apps:
+                  if not isinstance(app_slug, str):
+                      errors.append(f"{path}: domain application entries must be strings")
+                      continue
+                  if app_slug not in apps:
+                      errors.append(
+                          f"{path}: application '{app_slug}' listed in domain but missing in registry/applications"
+                      )
+
+          if errors:
+              print("Registry validation failed:\n")
+              for err in errors:
+                  print(f"- {err}")
+              sys.exit(1)
+
+          print(
+              "Registry validation passed "
+              f"(apps={len(app_files)}, interfaces={len(iface_files)}, domains={len(domain_files)})."
+          )
+          PY
