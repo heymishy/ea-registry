@@ -1,0 +1,22 @@
+# Domain Registry Entry
+# Copy this file to registry/domains/[domain-slug].yaml
+# Domains group applications by business capability area.
+# Owned by the EA team. Changes require EA team review.
+
+slug: "[domain-slug]"
+name: "[Domain display name]"       # e.g. "Payments", "Lending", "Identity and Access"
+description: "[What business capabilities this domain covers]"
+
+owner: "[ea-team or domain-architect-slug]"
+
+# Applications in this domain (reference only — authoritative field is in each app's YAML)
+# This list is maintained as a convenience index — keep in sync with application entries.
+applications:
+  - "[app-slug-1]"
+  - "[app-slug-2]"
+
+# Key domain-level notes for architects and skills
+notes: null
+
+verification_status: verified
+last_reviewed: "[YYYY-MM-DD]"

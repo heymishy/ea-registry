@@ -1,0 +1,19 @@
+slug: payments
+name: "Payments"
+description: >
+  Covers all capabilities related to card issuing, acquiring, payment initiation,
+  scheme connectivity, settlement, and fraud management. Includes both customer-facing
+  payment products and the underlying infrastructure that processes payment transactions.
+
+owner: "ea-team"
+
+applications:
+  - card-issuing-platform
+
+notes: >
+  Card issuing platform is currently the only registered application in this
+  sample domain entry for this iteration. Additional payment applications and
+  interfaces will be added in future updates as the registry is expanded.
+
+verification_status: verified
+last_reviewed: "2026-01-15"

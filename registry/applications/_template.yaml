@@ -1,0 +1,69 @@
+# Application Registry Entry
+# Copy this file to registry/applications/[app-slug].yaml
+# Replace all [bracketed] values. Remove comments before submitting.
+# See registry/CONVENTIONS.md for field definitions and allowed values.
+
+# ── Identity ──────────────────────────────────────────────────────────────────
+
+slug: [app-slug]                    # Stable, lowercase, hyphen-separated. Never change after first PR.
+name: "[Full Application Name]"     # Human-readable display name
+aliases:                            # Other names this system is known by (old names, acronyms, nicknames)
+  - "[alias-1]"
+  - "[alias-2]"
+
+# ── Ownership ─────────────────────────────────────────────────────────────────
+
+owner: "[team-or-person-slug]"      # Primary owner — approving reviewer for changes to this entry
+domain: "[domain-slug]"             # Business domain. Must match a slug in registry/domains/
+business_capability: "[capability]" # The business capability this system provides (plain language)
+vendor: "[vendor-name or null]"     # Vendor name if SaaS or vendor-supplied. null if bespoke.
+
+# ── Lifecycle ─────────────────────────────────────────────────────────────────
+
+lifecycle_status: active            # active | active-under-review | active-modernising |
+                                    # active-legacy | decommissioning | decommissioned | planned
+tier: T1                            # T1 (mission-critical) | T2 (business-important) | T3 (supporting)
+                                    # T1 = unplanned outage causes immediate customer or regulatory impact
+                                    # T2 = outage causes degraded service within hours
+                                    # T3 = outage causes internal inconvenience only
+
+modernisation_note: null            # Free text. Required if lifecycle_status is not 'active'.
+                                    # e.g. "Being replaced by E6 card platform. Programme starts Q3 2026."
+
+# ── Technology ────────────────────────────────────────────────────────────────
+
+technology:
+  language: "[e.g. Java 8, COBOL, C#]"
+  framework: "[e.g. Spring Boot, .NET 4.8, none]"
+  platform: "[e.g. IBM z/OS, AWS EKS, Azure App Service, on-prem Windows]"
+  hosting: on-prem                  # on-prem | cloud | saas | hybrid
+  database: "[e.g. Oracle 19c, SQL Server, PostgreSQL, none]"
+  vendor_platform: null             # If SaaS: vendor platform name e.g. "Fiserv DNA", "Episode Six"
+
+# ── Data ──────────────────────────────────────────────────────────────────────
+
+data_domains_owned:                 # Data this system is the system-of-record for
+  - "[data-domain]"                 # e.g. card-account, transaction-history, customer-profile
+
+data_domains_consumed:              # Data this system reads but does not own
+  - "[data-domain]"
+
+data_classification:
+  contains_pii: false               # true | false
+  contains_pci: false               # true | false — card data in scope for PCI DSS
+  regulatory_data: []               # List regulatory frameworks: [AML, CCCFA, RBNZ-BS11, etc.]
+
+# ── Regulatory and compliance ─────────────────────────────────────────────────
+
+regulatory_scope:                   # Regulatory frameworks this application is in scope for
+  - framework: "[e.g. PCI-DSS]"
+    scope: "[brief description of why in scope]"
+    last_assessed: "[YYYY-MM-DD]"
+
+# ── Registry metadata ─────────────────────────────────────────────────────────
+
+verification_status: unverified     # unverified | verified | disputed | stale
+                                    # Set to 'verified' only after owner review of this entry
+last_reviewed: "[YYYY-MM-DD]"
+source: manual                      # manual | skill-reverse-engineer | skill-[other] | import
+notes: null                         # Any additional context for architects and engineers

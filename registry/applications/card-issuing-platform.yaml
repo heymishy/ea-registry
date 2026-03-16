@@ -1,0 +1,69 @@
+# Example application entry — illustrates a legacy platform under modernisation
+# See registry/CONVENTIONS.md for field definitions
+
+slug: card-issuing-platform
+name: "Card Issuing Platform"
+aliases:
+  - "Fiserv"
+  - "CIP"
+  - "card-platform"
+
+owner: "payments-engineering"
+domain: "payments"
+business_capability: >
+  Manages the full card issuing lifecycle — card account creation, authorisation
+  processing, limit management, fee calculation, statement generation, and
+  dispute management for all Visa and eftpos debit and credit card products.
+vendor: "Fiserv"
+
+lifecycle_status: active-modernising
+tier: T1
+
+modernisation_note: >
+  Being replaced by Episode Six (E6) card issuing platform. Programme in assessment
+  phase. Reverse engineering extraction in progress. Target go-live TBD.
+
+technology:
+  language: "COBOL / Java 8 (mixed)"
+  framework: "Fiserv DNA"
+  platform: "IBM z/OS (COBOL core) + on-prem Linux (Java services)"
+  hosting: on-prem
+  database: "DB2 (z/OS) + Oracle 19c (Java services)"
+  vendor_platform: "Fiserv DNA"
+
+data_domains_owned:
+  - card-account
+  - card-transaction
+  - card-limit
+  - statement
+  - card-product-configuration
+
+data_domains_consumed:
+  - customer-profile
+  - merchant-data
+
+data_classification:
+  contains_pii: true
+  contains_pci: true
+  regulatory_data:
+    - PCI-DSS
+    - RBNZ-BS11
+    - AML-CFT
+    - VISA-CRS
+    - MASTERCARD-MCOM
+
+regulatory_scope:
+  - framework: PCI-DSS
+    scope: "Stores, processes, and transmits cardholder data. PCI SAQ D compliant."
+    last_assessed: "2025-09-01"
+  - framework: RBNZ-BS11
+    scope: "Systemic importance as primary card issuing infrastructure."
+    last_assessed: "2025-06-01"
+
+verification_status: verified
+last_reviewed: "2026-01-15"
+source: manual
+notes: >
+  Reverse engineering extraction started 2026-03. Interface inventory being
+  updated as extraction progresses. See artefacts/card-issuing-platform/
+  reverse-engineering-report.md for full extraction detail.

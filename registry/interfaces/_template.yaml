@@ -1,0 +1,109 @@
+# Interface Registry Entry
+# Copy this file to registry/interfaces/[source]--[target]--[name].yaml
+# File naming: source = the system that initiates or sends; target = the system that receives.
+# For bidirectional interfaces: use the system that initiates the primary flow as source.
+# See registry/CONVENTIONS.md for type taxonomy and allowed values.
+
+# ── Identity ──────────────────────────────────────────────────────────────────
+
+slug: "[source-app]--[target-app]--[interface-name]"
+name: "[Human-readable interface name]"   # e.g. "Card auth request to fraud engine"
+
+# ── Participants ──────────────────────────────────────────────────────────────
+
+source:
+  app: "[source-app-slug]"          # Must match a slug in registry/applications/
+  role: sender                      # sender | caller | producer | writer | initiator
+
+target:
+  app: "[target-app-slug]"          # Must match a slug in registry/applications/
+  role: receiver                    # receiver | responder | consumer | reader | processor
+
+direction: unidirectional           # unidirectional | bidirectional | request-response
+                                    # unidirectional: data flows one way only
+                                    # request-response: source sends and expects a synchronous reply
+                                    # bidirectional: both systems initiate flows independently
+
+# ── Interface type ────────────────────────────────────────────────────────────
+
+type: api-sync                      # api-sync | event-async | batch-file | db-coupling | stream | manual
+subtype: rest                       # See CONVENTIONS.md for allowed subtypes per type
+
+protocol:
+  format: "[e.g. JSON, XML, ISO 8583, CSV, fixed-width, Avro, binary]"
+  spec: null                        # Link or reference to formal spec, schema, or WSDL if available
+  version: null                     # API version or schema version if applicable
+
+# ── Behaviour ─────────────────────────────────────────────────────────────────
+
+trigger: "[What causes this interface to be invoked]"
+# Examples:
+#   api-sync: "Inbound card authorisation request from card scheme network"
+#   event-async: "Card transaction created event published to topic card-transactions"
+#   batch-file: "Nightly batch job at 23:00 NZST — produces daily settlement file"
+#   db-coupling: "Payment service polls payments table every 30 seconds for new rows"
+
+frequency: "[e.g. real-time, near-real-time, nightly, weekly, on-demand, continuous]"
+
+sla:
+  latency: null                     # e.g. "<200ms p99" for synchronous; null for batch
+  availability: null                # e.g. "99.95% during business hours"
+  batch_window: null                # e.g. "Completes by 02:00 NZST" — for batch interfaces
+
+# ── Data exchanged ────────────────────────────────────────────────────────────
+
+data_summary: "[Plain language description of what data crosses this interface]"
+# Not a full schema — describe the business content at a domain level.
+# e.g. "Card authorisation request including PAN, amount, merchant, and transaction metadata.
+#       Response includes approval/decline decision and authorisation code."
+
+data_classification:
+  contains_pii: false
+  contains_pci: false
+  regulatory_data: []               # e.g. [AML, CCCFA]
+
+# ── Criticality ───────────────────────────────────────────────────────────────
+
+criticality: high                   # critical | high | medium | low
+                                    # critical: failure causes immediate customer or regulatory impact
+                                    # high: failure causes degraded service within minutes/hours
+                                    # medium: failure causes degraded service within hours/days
+                                    # low: failure has minimal customer impact
+
+failure_impact: "[What happens to the business if this interface fails]"
+# e.g. "Card authorisations cannot be fraud-screened — issuer must decline all or accept risk"
+
+# ── Error handling ────────────────────────────────────────────────────────────
+
+error_handling:
+  timeout_ms: null                  # Timeout threshold in milliseconds (sync interfaces)
+  retry_policy: null                # e.g. "3 retries with exponential backoff"
+  failure_mode: null                # e.g. "fail-open (approve without fraud check)", "fail-closed (decline)"
+  dead_letter: null                 # Dead letter queue or error handling destination if async
+
+# ── Modernisation ─────────────────────────────────────────────────────────────
+
+modernisation_disposition: active   # active | under-review | changing | retiring | planned | retired
+modernisation_note: null            # Required if disposition is not 'active'.
+                                    # e.g. "Source app being replaced by E6. This interface will be
+                                    #       replaced by E6 native API. Design decision pending."
+
+counterparty_change_required: false # true if the counterparty system must change for modernisation
+counterparty_change_notes: null     # What change is required from the counterparty
+
+# ── Discovery metadata ────────────────────────────────────────────────────────
+# How this interface was found — important for confidence assessment
+
+discovery:
+  method: manual                    # manual | skill-reverse-engineer | skill-[other] | documented | observed
+  evidence: null                    # Reference to evidence: spec doc, code location, test, observation
+  hidden_pattern: null              # If found via hidden pattern scan: shared-db | file-drop | polling |
+                                    # undocumented-callback | timing-contract | shared-cache | hardcoded-host
+
+# ── Registry metadata ─────────────────────────────────────────────────────────
+
+verification_status: unverified     # unverified | verified | disputed | stale
+                                    # Requires review from BOTH source and target app owners to verify
+last_verified: "[YYYY-MM-DD]"
+source: manual                      # manual | skill-reverse-engineer | skill-[other]
+notes: null
