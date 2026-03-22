@@ -1,7 +1,6 @@
 # EA Registry
 
-Enterprise application and interface registry for Westpac NZ.
-
+Enterprise application and interface registry
 This repository stores registry data as YAML in `registry/`.
 
 ## Key Paths
