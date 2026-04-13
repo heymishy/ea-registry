@@ -2,14 +2,14 @@
 
 ## What this repository is
 
-This is the enterprise application and interface registry for Westpac NZ.
+This is the example application and interface registry for heymishy apps
 It is the authoritative source of truth for all applications, the interfaces
 between them, and the business domains they belong to.
 
 It is not a product codebase. There is no application code here.
 Every file in `registry/` is a YAML data entry or a reference document.
 
-**Registry repo:** https://bitbucket.westpac.co.nz/projects/[PROJECT-KEY]/repos/ea-registry
+**Registry repo:** https://github.com/heymishy/ea-registry.git
 
 ---
 
@@ -81,8 +81,8 @@ In any product repo's `.github/copilot-instructions.md`, reference this registry
 
 ```markdown
 ## EA Registry
-EA Registry repo: https://bitbucket.westpac.co.nz/projects/[PROJECT-KEY]/repos/ea-registry
-Raw file base URL: https://bitbucket.westpac.co.nz/projects/[PROJECT-KEY]/repos/ea-registry/raw
+EA Registry repo: https://github.com/heymishy/ea-registry.git
+Raw file base URL: https://raw.githubusercontent.com/heymishy/ea-registry/refs/heads/main/README.md
 
 Skills that interact with the registry (/discovery, /reverse-engineer, /definition)
 should read application and interface entries from this repo when identifying
