@@ -1,7 +1,7 @@
 # EA Registry — Conventions and Format Reference
 
-**Registry repo:** https://bitbucket.westpac.co.nz/projects/[PROJECT-KEY]/repos/ea-registry
-**Raw file base URL:** https://bitbucket.westpac.co.nz/projects/[PROJECT-KEY]/repos/ea-registry/raw
+**Registry repo:** https://github.com/heymishy/ea-registry.git
+**Raw file base URL:** https://raw.githubusercontent.com/heymishy/ea-registry/refs/heads/main/README.md
 
 ## What this registry is
 
